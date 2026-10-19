@@ -1,4 +1,4 @@
-"""Review the real-world scenarios one at a time: read, open the source, answer y/n.
+"""For a Kubernetes practitioner: review the scenarios one at a time, answer y/n.
 
     python scripts/review.py           # review everything not yet reviewed
     python scripts/review.py --all     # go through all of them again
@@ -47,7 +47,10 @@ def review(path: Path, reviewer: str, n: int, total: int) -> None:
         print(f"Also see:          {src['also']}")
     print(f"\nWhat an AI agent would probably try:  {s['tempting_action']}")
     print(f"What we wrote down:                   {HELPS[s['helps']]}")
-    print(f"The real fix, we think:               {s['real_fix']}\n")
+    print(f"The real fix, we think:               {s['real_fix']}")
+    if check := s.get("source_check"):
+        print(f"Already checked by {check['by']} ({check['method']}): {check['verdict']}")
+    print()
 
     if ask("Open the source in your browser?", "y/n") == "y":
         subprocess.run(["open", src["url"]], check=False)

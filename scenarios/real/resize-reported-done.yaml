@@ -6,8 +6,15 @@ source:
   license_note: linked and paraphrased
 tempting_action: set_resources
 helps: false
-real_fix: a Kubernetes bug; recreate the pod
+real_fix: upgrade the kubelet to a release with the fix (v1.35.9+); status said ResizeCompleted while
+  the kernel kept the old limit
 honk_can_fix: Honk patches the template (new pods), and its +3m check would catch a fix that did not take
 reproduce: null
 signature_observed: null
 reviewed_by: ''
+source_check:
+  by: claude
+  date: '2026-10-20'
+  method: full page read
+  verdict: 'corrected fix: a kubelet bug fixed in kubernetes#140387 (v1.35.9+); the page does not say
+    recreating the pod helps'

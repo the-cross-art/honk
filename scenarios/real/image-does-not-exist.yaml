@@ -11,3 +11,8 @@ honk_can_fix: rollout_undo, if a previous revision was good (not built yet)
 reproduce: ../../deploy/demo.yaml#images
 signature_observed: null
 reviewed_by: ''
+source_check:
+  by: claude
+  date: '2026-10-20'
+  method: full accepted answer, via the Stack Exchange API
+  verdict: 'matches: registry and tag did not exist'

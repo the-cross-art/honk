@@ -6,9 +6,16 @@ source:
   also: https://medium.com/omio-engineering/cpu-limits-and-aggressive-throttling-in-kubernetes-c5b20bd8a718
   license_note: linked and paraphrased
 tempting_action: scale
-helps: partly
-real_fix: remove or raise CPU limits on latency-sensitive services
+helps: false
+real_fix: remove CPU limits on latency-critical services (isolated on their own nodes) and set requests
+  from peak usage
 honk_can_fix: set_resources raising limits.cpu up to 2x; Honk cannot see latency
 reproduce: null
 signature_observed: null
 reviewed_by: ''
+source_check:
+  by: claude
+  date: '2026-10-20'
+  method: full page read
+  verdict: 'corrected: the article does not say scaling helped; the fix was removing CPU limits on critical
+    services, isolating them on tainted nodes, and requests at peak + 20%'

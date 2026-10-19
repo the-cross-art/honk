@@ -24,6 +24,7 @@ def test_scenario_is_well_formed(path: Path) -> None:
     assert s["helps"] in (True, False, "temporarily", "partly")
     if s["source"]["kind"] != "demo":
         assert s["source"]["url"].startswith("https://")
+        assert s["source_check"]["verdict"], "every real scenario is checked against its source"
     if s["reproduce"]:
         manifest = s["reproduce"].split("#")[0]
         assert (path.parent / manifest).exists(), manifest

@@ -22,6 +22,9 @@ and reproducible failures skew toward persistent misconfiguration.
   API (rate-limited, cached in `scenarios/.cache/`, which is not committed).
 
 `signature_observed` is filled only from a live read, never by hand.
+`source_check` records Claude reading the full source; `reviewed_by` is for a
+person with Kubernetes production experience (`python scripts/review.py`). Do
+not publish numbers from scenarios with an empty `reviewed_by`.
 
 ## Format
 

@@ -30,8 +30,8 @@
 3. Ask Claude Code to fix namespace `store`. Expect: `checkout` restart fails, `cart`
    restart fails and `set_resources` fixes it, `search` restart retracted at +1h,
    `images` nothing helps. Fix whatever breaks; record surprises below.
-4. The author reviews `scenarios/real/*.yaml` (does `helps` match the source? is
-   `real_fix` right?) and fills `reviewed_by`. Then run the agent study.
+4. A Kubernetes practitioner (from outreach) runs `scripts/review.py` on the 23
+   scenarios. Until then, publish no numbers from them. Agent study meanwhile.
 
 ## Roadmap ideas (not started)
 
@@ -99,3 +99,9 @@ Live reads found a signature bug the unit tests had missed: a container exiting
 back-off, so one incident split across two cells (the research repo's #41 shape
 again). Fixed as `honk_sig_v2`; all 9 now read identically on 5 of 5 samples.
 Lesson: every scenario's `signature_observed` must come from a live read.
+
+Source check: Claude re-read all 23 sources in full (Stack Overflow via the API,
+others by page). 5 answer keys were wrong when written from search snippets,
+including Grafana (adding capacity *did* restore service) and the resize bug (the
+fix is a kubelet upgrade, not recreating the pod). Snippet-grade sources are a
+hypothesis, same lesson as the research repo's citations.

@@ -11,3 +11,8 @@ honk_can_fix: 'none by default: kube-system denied, and 20x exceeds the 2x step'
 reproduce: null
 signature_observed: null
 reviewed_by: ''
+source_check:
+  by: claude
+  date: '2026-10-20'
+  method: full page read
+  verdict: 'matches: CoreDNS kept dying at 100Mi; on-call raised it to 2000Mi'

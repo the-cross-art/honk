@@ -1,5 +1,5 @@
 id: probe-wrong-port
-title: Probe and service target a port the container does not listen on
+title: Health checks and the Service target a port the container does not listen on
 source:
   url: https://stackoverflow.com/questions/53535540
   kind: stackoverflow
@@ -11,3 +11,9 @@ honk_can_fix: none (spec change)
 reproduce: manifests/probe-wrong-port.yaml
 signature_observed: crash_loop / clean / deployment  [honk_sig_v2, kind 2026-10-19, 5/5 reads]
 reviewed_by: ''
+source_check:
+  by: claude
+  date: '2026-10-20'
+  method: full accepted answer, via the Stack Exchange API
+  verdict: 'corrected title: the cause was a Service targetPort that did not match the container port;
+    our manifest reproduces the probe variant of the same mistake'

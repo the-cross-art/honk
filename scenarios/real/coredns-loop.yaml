@@ -12,3 +12,9 @@ honk_can_fix: none; kube-system is denied by default policy
 reproduce: null
 signature_observed: null
 reviewed_by: ''
+source_check:
+  by: claude
+  date: '2026-10-20'
+  method: full accepted answer, via the Stack Exchange API
+  verdict: 'matches: preferred fix removes the loop (systemd-resolved resolv.conf); a restart only helps
+    after the config change'

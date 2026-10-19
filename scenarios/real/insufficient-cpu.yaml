@@ -12,3 +12,9 @@ honk_can_fix: set_resources lowering requests.cpu, only if within 2x
 reproduce: manifests/insufficient-cpu.yaml
 signature_observed: unschedulable / deployment  [honk_sig_v2, kind 2026-10-19, 5/5 reads]
 reviewed_by: ''
+source_check:
+  by: claude
+  date: '2026-10-20'
+  method: full accepted answer, via the Stack Exchange API
+  verdict: 'partly: the answer only says requests cannot be overcommitted; ''lower requests or add nodes''
+    is our inference from that'

@@ -12,3 +12,8 @@ honk_can_fix: none (probe is spec)
 reproduce: manifests/liveness-timeout.yaml
 signature_observed: crash_loop / sigkill / deployment  [honk_sig_v2, kind 2026-10-19, 5/5 reads]
 reviewed_by: ''
+source_check:
+  by: claude
+  date: '2026-10-20'
+  method: full accepted answer, via the Stack Exchange API
+  verdict: 'matches: fixed by increasing timeoutSeconds'

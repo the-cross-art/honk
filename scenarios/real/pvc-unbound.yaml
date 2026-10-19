@@ -12,3 +12,8 @@ honk_can_fix: none (storage config)
 reproduce: manifests/pvc-unbound.yaml
 signature_observed: unschedulable / deployment  [honk_sig_v2, kind 2026-10-19, 5/5 reads]
 reviewed_by: ''
+source_check:
+  by: claude
+  date: '2026-10-20'
+  method: full accepted answer, via the Stack Exchange API
+  verdict: 'matches: PV capacity (10Gi) did not match the claim (3Gi)'

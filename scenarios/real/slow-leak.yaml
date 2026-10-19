@@ -12,3 +12,8 @@ reproduce: manifests/slow-leak.yaml
 signature_observed: healthy / deployment (until the leak hits the limit, ~12 min)  [honk_sig_v2, kind
   2026-10-19, 5/5 reads]
 reviewed_by: ''
+source_check:
+  by: claude
+  date: '2026-10-20'
+  method: full accepted answer, via the Stack Exchange API
+  verdict: 'matches: a thread/resource leak in a third-party async call'

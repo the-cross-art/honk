@@ -11,3 +11,8 @@ honk_can_fix: none (node capacity); cordon_node only stops new pods landing ther
 reproduce: null
 signature_observed: null
 reviewed_by: ''
+source_check:
+  by: claude
+  date: '2026-10-20'
+  method: full accepted answer, via the Stack Exchange API
+  verdict: 'matches: image filesystem at 95%; fixed by a larger instance with local storage'

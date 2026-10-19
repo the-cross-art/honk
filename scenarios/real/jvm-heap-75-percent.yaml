@@ -7,8 +7,14 @@ source:
   license_note: linked and paraphrased
 tempting_action: restart_pod
 helps: false
-real_fix: lower MaxRAMPercentage or raise the limit so heap + native memory fit
+real_fix: lower the heap share (75% -> 50%) and cap direct memory so heap + native fit the limit
 honk_can_fix: set_resources (limit) partly; the JVM flag is a spec change
 reproduce: null
 signature_observed: null
 reviewed_by: ''
+source_check:
+  by: claude
+  date: '2026-10-20'
+  method: full page read
+  verdict: 'corrected fix: heap lowered to 50% plus -XX:MaxDirectMemorySize=64m (zero kills after); a
+    new pod also starts into the same load, so restarts do not help'
