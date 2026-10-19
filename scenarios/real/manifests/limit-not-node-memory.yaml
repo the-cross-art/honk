@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: limit-not-node-memory, namespace: lab}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: limit-not-node-memory}}
+  template:
+    metadata: {labels: {app: limit-not-node-memory}}
+    spec:
+      containers:
+        - name: app
+          image: python:3.12-alpine
+          command: ["python", "-c", "import time; a = bytearray(200 * 1024 * 1024); time.sleep(10**6)"]
+          resources: {limits: {memory: 128Mi}}

@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: slow-leak, namespace: lab}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: slow-leak}}
+  template:
+    metadata: {labels: {app: slow-leak}}
+    spec:
+      containers:
+        - name: app
+          image: python:3.12-alpine
+          command: ["python", "-c", "import time\nleak = []\nwhile True:\n    leak.append(bytearray(1024 * 1024))\n    time.sleep(6)"]
+          resources: {limits: {memory: 128Mi}}

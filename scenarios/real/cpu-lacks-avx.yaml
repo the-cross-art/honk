@@ -1,0 +1,13 @@
+id: cpu-lacks-avx
+title: MongoDB 5 crash-loops on a CPU without AVX
+source:
+  url: https://stackoverflow.com/questions/70818543
+  kind: stackoverflow
+  license_note: CC BY-SA 4.0; linked and paraphrased, not copied
+tempting_action: restart_pod
+helps: false
+real_fix: run mongo 4.4.x, or nodes whose CPUs have AVX
+honk_can_fix: rollout_undo if the previous revision ran 4.4 (not built yet)
+reproduce: null
+signature_observed: null
+reviewed_by: ''

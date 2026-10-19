@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: exits-immediately, namespace: lab}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: exits-immediately}}
+  template:
+    metadata: {labels: {app: exits-immediately}}
+    spec:
+      containers:
+        - name: app
+          image: busybox:1.36
+          command: ["sh", "-c", "echo started"]

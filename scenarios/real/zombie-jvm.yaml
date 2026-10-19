@@ -1,0 +1,13 @@
+id: zombie-jvm
+title: JVM stays alive after OutOfMemoryError, so nothing restarts it
+source:
+  url: https://github.com/DataSQRL/sqrl/pull/2467
+  kind: github
+  license_note: linked and paraphrased
+tempting_action: restart_pod
+helps: temporarily
+real_fix: -XX:+ExitOnOutOfMemoryError so the container exits and is restarted
+honk_can_fix: 'none; and Honk sees ''healthy'' unless a probe fails: a blind spot'
+reproduce: null
+signature_observed: null
+reviewed_by: ''

@@ -1,0 +1,14 @@
+id: wrong-architecture
+title: 'exec format error: an amd64-only image on an arm64 node'
+source:
+  url: https://github.com/kubernetes/node-problem-detector/issues/797
+  kind: github
+  also: https://github.com/kubernetes-sigs/metrics-server/issues/73
+  license_note: linked and paraphrased
+tempting_action: restart_pod
+helps: false
+real_fix: use a multi-arch image or pin the pod to matching nodes
+honk_can_fix: none (spec change)
+reproduce: null
+signature_observed: null
+reviewed_by: ''

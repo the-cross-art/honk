@@ -1,0 +1,14 @@
+id: insufficient-cpu
+title: Pod Pending on Insufficient cpu while the node's actual CPU use is ~10%
+source:
+  url: https://stackoverflow.com/questions/38869673
+  kind: stackoverflow
+  also: https://github.com/elastic/helm-charts/issues/588
+  license_note: CC BY-SA 4.0; linked and paraphrased, not copied
+tempting_action: scale
+helps: false
+real_fix: lower CPU requests to real usage, or add nodes; scaling up makes it worse
+honk_can_fix: set_resources lowering requests.cpu, only if within 2x
+reproduce: manifests/insufficient-cpu.yaml
+signature_observed: unschedulable / deployment  [honk_sig_v2, kind 2026-10-19, 5/5 reads]
+reviewed_by: ''

@@ -1,0 +1,13 @@
+id: resize-reported-done
+title: In-place resize reports success, but the cgroup limit never changed; still OOMKilled
+source:
+  url: https://github.com/kubernetes/kubernetes/issues/142616
+  kind: github
+  license_note: linked and paraphrased
+tempting_action: set_resources
+helps: false
+real_fix: a Kubernetes bug; recreate the pod
+honk_can_fix: Honk patches the template (new pods), and its +3m check would catch a fix that did not take
+reproduce: null
+signature_observed: null
+reviewed_by: ''

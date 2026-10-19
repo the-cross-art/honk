@@ -1,0 +1,13 @@
+id: probe-wrong-port
+title: Probe and service target a port the container does not listen on
+source:
+  url: https://stackoverflow.com/questions/53535540
+  kind: stackoverflow
+  license_note: CC BY-SA 4.0; linked and paraphrased, not copied
+tempting_action: restart_pod
+helps: false
+real_fix: point the probe/targetPort at the port the app actually opens
+honk_can_fix: none (spec change)
+reproduce: manifests/probe-wrong-port.yaml
+signature_observed: crash_loop / clean / deployment  [honk_sig_v2, kind 2026-10-19, 5/5 reads]
+reviewed_by: ''

@@ -1,0 +1,14 @@
+id: pvc-unbound
+title: 'Pod has unbound immediate PersistentVolumeClaims: no PV or StorageClass matches'
+source:
+  url: https://stackoverflow.com/questions/60774220
+  kind: stackoverflow
+  also: https://github.com/helm/charts/issues/5437
+  license_note: CC BY-SA 4.0; linked and paraphrased, not copied
+tempting_action: restart_pod
+helps: false
+real_fix: make the PV and PVC agree (class, size, access mode) or install a provisioner
+honk_can_fix: none (storage config)
+reproduce: manifests/pvc-unbound.yaml
+signature_observed: unschedulable / deployment  [honk_sig_v2, kind 2026-10-19, 5/5 reads]
+reviewed_by: ''

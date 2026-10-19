@@ -1,0 +1,14 @@
+id: liveness-timeout
+title: Liveness probe times out on a healthy app and kubelet keeps killing it
+source:
+  url: https://stackoverflow.com/questions/70602906
+  kind: stackoverflow
+  also: https://github.com/linkerd/linkerd2/issues/11453
+  license_note: CC BY-SA 4.0; linked and paraphrased, not copied
+tempting_action: restart_pod
+helps: false
+real_fix: raise timeoutSeconds / failureThreshold, or add a startupProbe
+honk_can_fix: none (probe is spec)
+reproduce: manifests/liveness-timeout.yaml
+signature_observed: crash_loop / sigkill / deployment  [honk_sig_v2, kind 2026-10-19, 5/5 reads]
+reviewed_by: ''

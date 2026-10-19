@@ -1,0 +1,14 @@
+id: jvm-heap-75-percent
+title: JVM heap set to 75% of the limit leaves no room for native memory; killed under load
+source:
+  url: https://github.com/enorm-labs/event-junkie/issues/1766
+  kind: github
+  also: https://github.com/nudgebee/opentelemetry-demo/pull/475
+  license_note: linked and paraphrased
+tempting_action: restart_pod
+helps: false
+real_fix: lower MaxRAMPercentage or raise the limit so heap + native memory fit
+honk_can_fix: set_resources (limit) partly; the JVM flag is a spec change
+reproduce: null
+signature_observed: null
+reviewed_by: ''

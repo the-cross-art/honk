@@ -1,0 +1,13 @@
+id: prometheus-oom
+title: Prometheus OOMKilled because its series count needs more than the 1Gi limit
+source:
+  url: https://stackoverflow.com/questions/63541085
+  kind: stackoverflow
+  license_note: CC BY-SA 4.0; linked and paraphrased, not copied
+tempting_action: restart_pod
+helps: false
+real_fix: raise the limit to fit the series count, or reduce cardinality
+honk_can_fix: set_resources if 2x is enough
+reproduce: null
+signature_observed: null
+reviewed_by: ''

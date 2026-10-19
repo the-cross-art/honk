@@ -1,0 +1,13 @@
+id: pm-nre-labs-etcd-liveness
+title: 'Postmortem: a failing liveness probe restarted etcd every ~2 minutes; restarts hid the cause'
+source:
+  url: https://oswalt.dev/2018/12/december-4-nre-labs-outage-post-mortem/
+  kind: postmortem
+  license_note: linked and paraphrased
+tempting_action: restart_pod
+helps: false
+real_fix: remove the bad liveness probe from the etcd manifest
+honk_can_fix: none; control plane, and restarts are exactly what made it worse
+reproduce: null
+signature_observed: null
+reviewed_by: ''

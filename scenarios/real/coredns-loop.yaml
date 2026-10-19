@@ -1,0 +1,14 @@
+id: coredns-loop
+title: CoreDNS crash-loops because it detects a resolv.conf forwarding loop
+source:
+  url: https://stackoverflow.com/questions/53075796
+  kind: stackoverflow
+  also: https://github.com/coredns/coredns/issues/2087
+  license_note: CC BY-SA 4.0; linked and paraphrased, not copied
+tempting_action: rollout_restart
+helps: false
+real_fix: point kubelet at the real upstream resolv.conf (or fix the Corefile)
+honk_can_fix: none; kube-system is denied by default policy
+reproduce: null
+signature_observed: null
+reviewed_by: ''

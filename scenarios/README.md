@@ -12,6 +12,17 @@ how to reproduce it and what actually fixed it. They serve two purposes:
 They do not measure real-world rates: once reproduced, a failure is injected,
 and reproducible failures skew toward persistent misconfiguration.
 
+## Layout
+
+- `real/` — failures people hit, from Stack Overflow, GitHub issues and public
+  postmortems. `real/manifests/` reproduces the ones that fit on a laptop
+  (namespace `lab`): `kubectl apply -f scenarios/real/manifests/`.
+- `demo/` — the four services in `deploy/demo.yaml`.
+- `scripts/stackexchange.py` refreshes the Stack Overflow pool through the official
+  API (rate-limited, cached in `scenarios/.cache/`, which is not committed).
+
+`signature_observed` is filled only from a live read, never by hand.
+
 ## Format
 
 One YAML file per scenario:

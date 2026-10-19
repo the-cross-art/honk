@@ -1,0 +1,13 @@
+id: run-as-non-root
+title: runAsNonRoot set but the image's user is not numeric, so the kubelet refuses to start it
+source:
+  url: https://stackoverflow.com/questions/53949329
+  kind: stackoverflow
+  license_note: CC BY-SA 4.0; linked and paraphrased, not copied
+tempting_action: rollout_restart
+helps: false
+real_fix: set a numeric runAsUser (e.g. 1000) in the securityContext
+honk_can_fix: none (spec change)
+reproduce: manifests/run-as-non-root.yaml
+signature_observed: config_error / deployment  [honk_sig_v2, kind 2026-10-19, 5/5 reads]
+reviewed_by: ''

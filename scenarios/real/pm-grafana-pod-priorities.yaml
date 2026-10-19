@@ -1,0 +1,13 @@
+id: pm-grafana-pod-priorities
+title: 'Postmortem: pod priorities caused a cascade of preemptions in production'
+source:
+  url: https://grafana.com/blog/2019/07/24/how-a-production-outage-was-caused-using-kubernetes-pod-priorities/
+  kind: postmortem
+  license_note: linked and paraphrased
+tempting_action: scale
+helps: false
+real_fix: fix the PriorityClass setup and capacity
+honk_can_fix: none
+reproduce: null
+signature_observed: null
+reviewed_by: ''

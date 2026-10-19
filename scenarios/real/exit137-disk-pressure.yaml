@@ -1,0 +1,13 @@
+id: exit137-disk-pressure
+title: CI pods die with exit 137 because the node image filesystem is at 95% and kubelet evicts
+source:
+  url: https://stackoverflow.com/questions/59729917
+  kind: stackoverflow
+  license_note: CC BY-SA 4.0; linked and paraphrased, not copied
+tempting_action: restart_pod
+helps: false
+real_fix: bigger node disks / instance type with local storage; clean images
+honk_can_fix: none (node capacity); cordon_node only stops new pods landing there
+reproduce: null
+signature_observed: null
+reviewed_by: ''

@@ -1,0 +1,13 @@
+id: limit-not-node-memory
+title: 'OOMKilled although the node has plenty of free memory: the container limit is what counts'
+source:
+  url: https://stackoverflow.com/questions/45270070
+  kind: stackoverflow
+  license_note: CC BY-SA 4.0; linked and paraphrased, not copied
+tempting_action: restart_pod
+helps: false
+real_fix: raise the container memory limit to what the app really needs
+honk_can_fix: set_resources (limits.memory, up to 2x per step)
+reproduce: manifests/limit-not-node-memory.yaml
+signature_observed: oom_killed / deployment  [honk_sig_v2, kind 2026-10-19, 5/5 reads]
+reviewed_by: ''

@@ -1,0 +1,13 @@
+id: exits-immediately
+title: Container has no long-running command, so it exits 0 and loops
+source:
+  url: https://stackoverflow.com/questions/41604499
+  kind: stackoverflow
+  license_note: CC BY-SA 4.0; linked and paraphrased, not copied
+tempting_action: restart_pod
+helps: false
+real_fix: give the image or pod spec a foreground command that keeps running
+honk_can_fix: none (spec change)
+reproduce: manifests/exits-immediately.yaml
+signature_observed: crash_loop / clean / deployment  [honk_sig_v2, kind 2026-10-19, 5/5 reads]
+reviewed_by: ''

@@ -1,0 +1,13 @@
+id: image-does-not-exist
+title: 'ImagePullBackOff: the registry or tag does not exist'
+source:
+  url: https://stackoverflow.com/questions/34848422
+  kind: stackoverflow
+  license_note: CC BY-SA 4.0; linked and paraphrased, not copied
+tempting_action: restart_pod
+helps: false
+real_fix: fix the image reference
+honk_can_fix: rollout_undo, if a previous revision was good (not built yet)
+reproduce: ../../deploy/demo.yaml#images
+signature_observed: null
+reviewed_by: ''

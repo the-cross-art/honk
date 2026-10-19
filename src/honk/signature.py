@@ -22,7 +22,8 @@ from collections.abc import Iterable, Mapping
 from dataclasses import asdict, dataclass
 from typing import Any, Final
 
-SIG_VERSION: Final[str] = "honk_sig_v1"
+# v2: a clean-exit loop is crash_loop/clean in every phase (was not_ready mid-cycle).
+SIG_VERSION: Final[str] = "honk_sig_v2"
 UNKNOWN: Final[str] = "_UNKNOWN_"
 NA: Final[str] = "_NA_"
 BARE_POD: Final[str] = "_BARE_POD_"
@@ -162,11 +163,14 @@ def failure_state(f: PodFacts) -> tuple[FailureState, str]:
         and f.running_seconds is not None
         and f.running_seconds < RECENT_RESTART_SECONDS
     )
+    # A container that exits 0 under restartPolicy Always loops too, and between
+    # restarts a read sees `terminated: Completed`, not CrashLoopBackOff. Both
+    # phases must land in one cell, so a clean exit counts once it has restarted.
     looping = (
         waiting == "CrashLoopBackOff"
         or waiting in START_FAILURE_REASONS
-        or (terminated is not None and terminated != "Completed")
-        or (recently_restarted and last_terminated not in (None, "Completed"))
+        or (terminated is not None and (terminated != "Completed" or f.restart_count > 0))
+        or (recently_restarted and last_terminated is not None)
     )
     if looping:
         if "OOMKilled" in (terminated, last_terminated):

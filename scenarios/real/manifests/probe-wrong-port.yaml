@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: probe-wrong-port, namespace: lab}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: probe-wrong-port}}
+  template:
+    metadata: {labels: {app: probe-wrong-port}}
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27-alpine
+          livenessProbe:
+            httpGet: {path: /, port: 8080}
+            periodSeconds: 5
+            failureThreshold: 2

@@ -1,0 +1,13 @@
+id: pm-zalando-coredns-oom
+title: 'Postmortem: CoreDNS at a 100Mi limit OOMKilled by a DNS storm; total DNS outage'
+source:
+  url: https://github.com/zalando-incubator/kubernetes-on-aws/blob/dev/docs/postmortems/jan-2019-dns-outage.md
+  kind: postmortem
+  license_note: linked and paraphrased
+tempting_action: rollout_restart
+helps: false
+real_fix: on-call raised CoreDNS memory to 2000Mi (20x); later per-node DNS cache, ndots tuning
+honk_can_fix: 'none by default: kube-system denied, and 20x exceeds the 2x step'
+reproduce: null
+signature_observed: null
+reviewed_by: ''

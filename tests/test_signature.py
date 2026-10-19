@@ -36,6 +36,24 @@ def test_crash_loop_is_one_state_across_the_restart_cycle() -> None:
     assert states == {(FailureState.CRASH_LOOP, "app_error")}
 
 
+def test_a_clean_exit_loop_is_one_state_across_the_restart_cycle() -> None:
+    """Found live: `command: echo started` read mid-cycle as not_ready."""
+    waiting = facts(waiting_reason="CrashLoopBackOff", last_terminated_reason="Completed",
+                    last_exit=0, restart_count=4)
+    terminated = facts(terminated_reason="Completed", terminated_exit=0, restart_count=4)
+    just_restarted = facts(running_seconds=1.0, last_terminated_reason="Completed",
+                           last_exit=0, restart_count=4)
+    states = {failure_state(f) for f in (waiting, terminated, just_restarted)}
+    assert states == {(FailureState.CRASH_LOOP, "clean")}
+
+
+def test_a_job_that_finished_is_not_a_loop() -> None:
+    done = facts(phase="Succeeded", terminated_reason="Completed", terminated_exit=0)
+    first_exit = facts(terminated_reason="Completed", terminated_exit=0, restart_count=0)
+    assert failure_state(done)[0] is FailureState.COMPLETED
+    assert failure_state(first_exit)[0] is not FailureState.CRASH_LOOP
+
+
 def test_oom_is_separate_from_crash_loop_in_every_phase() -> None:
     waiting = facts(waiting_reason="CrashLoopBackOff", last_terminated_reason="OOMKilled",
                     last_exit=137, restart_count=2)

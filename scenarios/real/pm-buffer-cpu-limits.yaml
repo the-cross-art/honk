@@ -1,0 +1,14 @@
+id: pm-buffer-cpu-limits
+title: 'Postmortem: CPU limits caused throttling and high latency on mostly idle nodes'
+source:
+  url: https://erickhun.com/posts/kubernetes-faster-services-no-cpu-limits/
+  kind: postmortem
+  also: https://medium.com/omio-engineering/cpu-limits-and-aggressive-throttling-in-kubernetes-c5b20bd8a718
+  license_note: linked and paraphrased
+tempting_action: scale
+helps: partly
+real_fix: remove or raise CPU limits on latency-sensitive services
+honk_can_fix: set_resources raising limits.cpu up to 2x; Honk cannot see latency
+reproduce: null
+signature_observed: null
+reviewed_by: ''

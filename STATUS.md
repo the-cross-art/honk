@@ -1,6 +1,6 @@
 # STATUS
 
-**2026-10-19 · v0.1 alpha · `make check` green: 66 tests, ruff, strict mypy · ran live on kind · not yet committed, not pushed**
+**2026-10-19 · v0.1 alpha · `make check` green: 96 tests, ruff, strict mypy · ran live on kind · not yet committed, not pushed**
 
 ## What works, and how it was verified
 
@@ -18,7 +18,8 @@
 
 ## What does not exist yet
 
-- Mined real-world scenarios (only 4 demo ones in `scenarios/demo/`).
+- Reviewer sign-off on the 23 real scenarios (`reviewed_by` is empty on all).
+- The agent study (with and without Honk) over the scenarios.
 - Slack approvals, Helm chart, admission policy pinning patch shapes, `rollout_undo`.
 
 ## Next action
@@ -29,7 +30,8 @@
 3. Ask Claude Code to fix namespace `store`. Expect: `checkout` restart fails, `cart`
    restart fails and `set_resources` fixes it, `search` restart retracted at +1h,
    `images` nothing helps. Fix whatever breaks; record surprises below.
-4. Mine about 20 real scenarios into `scenarios/` (format in `scenarios/README.md`).
+4. The author reviews `scenarios/real/*.yaml` (does `helps` match the source? is
+   `real_fix` right?) and fills `reviewed_by`. Then run the agent study.
 
 ## Roadmap ideas (not started)
 
@@ -86,3 +88,14 @@ approval binds to exactly what the human saw. Confirmed against Claude Code afte
 
 The record changed agent behaviour: shown "restart_pod: tried 1, fixed 0,
 failed 1", the agent declined to retry and named the real fix. Launch line.
+
+**Session 1, continued: real scenarios.** Stack Overflow is blocked for the web
+tools, so `scripts/stackexchange.py` uses the official Stack Exchange API
+(rate-limited, cached, not committed). 23 real scenarios in `scenarios/real/`
+from Stack Overflow, GitHub issues and k8s.af postmortems; 9 reproduce on kind.
+
+Live reads found a signature bug the unit tests had missed: a container exiting
+0 under restartPolicy Always read as `not_ready` mid-cycle and `crash_loop` in
+back-off, so one incident split across two cells (the research repo's #41 shape
+again). Fixed as `honk_sig_v2`; all 9 now read identically on 5 of 5 samples.
+Lesson: every scenario's `signature_observed` must come from a live read.

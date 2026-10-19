@@ -1,0 +1,13 @@
+id: pm-bluematador-no-limits
+title: 'Postmortem: fluentd pods with no requests/limits grew until the node hit SystemOOM'
+source:
+  url: https://www.bluematador.com/blog/post-mortem-kubernetes-node-oom
+  kind: postmortem
+  license_note: linked and paraphrased
+tempting_action: restart_pod
+helps: temporarily
+real_fix: Ruby GC tuning env var plus explicit memory/CPU requests and limits
+honk_can_fix: set_resources can add the missing limits; the GC env var is a spec change
+reproduce: null
+signature_observed: null
+reviewed_by: ''
