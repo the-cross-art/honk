@@ -51,7 +51,7 @@
 
 | # | Decision | Status |
 |---|---|---|
-| 1 | Default approval channel: in-client prompt or terminal only | `client` for now. A harness that auto-answers prompts would make approvals non-human; the approver column records the channel, and `approvals: cli` exists |
+| 1 | Default approval channel: in-client prompt or terminal only | **RESOLVED 2026-10-19: `client`.** Verified in Claude Code on protocol 2026-07-28: the prompt showed the record, the author clicked decline 9s later, and Honk recorded `denied` by `claude-code (in-client prompt)`. `approvals: cli` stays for harnesses that might answer prompts themselves |
 | 2 | Publish: GitHub repo, PyPI name `honkctl` | waiting on the author |
 | 3 | Autonomy floor values (`policy.FLOOR`) | chosen, not derived; revisit with real data |
 
@@ -81,5 +81,8 @@ In-client approvals did not appear in Claude Code because it negotiated protocol
 `2026-07-28` (seen in its MCP log), where a server cannot push a prompt mid-call.
 Rebuilt the approval on the SDK's resolver pattern: a read-only `preview` builds
 the question, and the SDK reuses an answer only for the identical question, so an
-approval binds to exactly what the human saw. Not yet confirmed against Claude
-Code itself: it depends on whether it declares the elicitation capability.
+approval binds to exactly what the human saw. Confirmed against Claude Code after a
+`/mcp` reconnect (the first test silently ran the old server process).
+
+The record changed agent behaviour: shown "restart_pod: tried 1, fixed 0,
+failed 1", the agent declined to retry and named the real fix. Launch line.
