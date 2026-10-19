@@ -1,0 +1,10 @@
+id: images-bad-tag
+title: Deployment points at an image tag that does not exist
+source: {url: "", kind: demo, license_note: written for this repo}
+reproduce: ../../deploy/demo.yaml#images
+signature: image_pull / deployment
+tempting_action: rollout_restart
+helps: false
+real_fix: correct the image tag (a GitOps change, outside Honk's actions)
+honk_expected: ask; outcome failed; Honk has no action that fixes it
+reviewed_by: ""

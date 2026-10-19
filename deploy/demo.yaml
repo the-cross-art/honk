@@ -1,0 +1,76 @@
+# Four broken services for the demo, in namespace `shop`. Images are multi-arch,
+# so this runs on Apple silicon kind nodes too.
+#
+#   checkout  exits 1 on a missing setting. Restarting cannot fix it.
+#   cart      allocates 96Mi under a 64Mi limit: a real runtime OOM.
+#             set_resources limits.memory=128Mi fixes it; restarting does not.
+#   search    serves fine for 10 minutes, then wedges (readiness fails).
+#             A restart looks like a fix at +3m and is retracted at +1h.
+#   images    points at an image tag that does not exist. Nothing Honk does fixes it.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: shop
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: checkout, namespace: shop}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: checkout}}
+  template:
+    metadata: {labels: {app: checkout}}
+    spec:
+      containers:
+        - name: app
+          image: busybox:1.36
+          command: ["sh", "-c", "echo 'fatal: PAYMENTS_URL is not set' >&2; exit 1"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: cart, namespace: shop}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: cart}}
+  template:
+    metadata: {labels: {app: cart}}
+    spec:
+      containers:
+        - name: app
+          image: python:3.12-alpine
+          command: ["python", "-c",
+                    "import time; a = bytearray(96 * 1024 * 1024); print('cart up', flush=True); time.sleep(10**6)"]
+          resources:
+            requests: {memory: 32Mi}
+            limits: {memory: 64Mi}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: search, namespace: shop}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: search}}
+  template:
+    metadata: {labels: {app: search}}
+    spec:
+      containers:
+        - name: app
+          image: busybox:1.36
+          command: ["sh", "-c", "touch /tmp/ok; sleep 600; rm /tmp/ok; echo 'deadlocked' >&2; sleep 1000000"]
+          readinessProbe:
+            exec: {command: ["cat", "/tmp/ok"]}
+            periodSeconds: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: images, namespace: shop}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: images}}
+  template:
+    metadata: {labels: {app: images}}
+    spec:
+      containers:
+        - name: app
+          image: busybox:9.99-does-not-exist
+          command: ["sh", "-c", "sleep 1000000"]

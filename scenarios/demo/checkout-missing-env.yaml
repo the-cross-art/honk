@@ -1,0 +1,10 @@
+id: checkout-missing-env
+title: App exits 1 at startup because a required setting is missing
+source: {url: "", kind: demo, license_note: written for this repo}
+reproduce: ../../deploy/demo.yaml#checkout
+signature: crash_loop / app_error / deployment
+tempting_action: restart_pod
+helps: false
+real_fix: set PAYMENTS_URL in the Deployment and roll out
+honk_expected: ask; outcome failed; warns after 2 failed tries; throttles at 3 per hour
+reviewed_by: ""

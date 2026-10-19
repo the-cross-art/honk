@@ -1,0 +1,74 @@
+# Two identities. The agent gets read-only access; Honk gets exactly the writes
+# its six actions need. RBAC is the real boundary: Honk's in-process checks catch
+# its own bugs, but only this grant limits what a stolen Honk credential can do.
+#
+# Note: RBAC cannot narrow `patch` to one field, so `honk` could change any field
+# of a Deployment or Node if its credential leaked. Honk's request shapes are
+# fixed in code; an admission policy pinning them is on the roadmap.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: honk-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: honk
+  namespace: honk-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: agent-readonly
+  namespace: honk-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: honk
+rules:
+  - apiGroups: [""]
+    resources: [pods, nodes, replicationcontrollers]
+    verbs: [get, list]
+  - apiGroups: [apps]
+    resources: [deployments, statefulsets, daemonsets, replicasets]
+    verbs: [get, list]
+  - apiGroups: [batch]
+    resources: [jobs, cronjobs]
+    verbs: [get, list]
+  - apiGroups: [""]
+    resources: [pods/eviction]
+    verbs: [create]
+  - apiGroups: [apps]
+    resources: [deployments, statefulsets, daemonsets]
+    verbs: [patch]
+  - apiGroups: [""]
+    resources: [nodes]
+    verbs: [patch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: honk
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: honk
+subjects:
+  - kind: ServiceAccount
+    name: honk
+    namespace: honk-system
+---
+# The built-in `view` role: reads most objects, never secrets, never writes.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: agent-readonly
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
+subjects:
+  - kind: ServiceAccount
+    name: agent-readonly
+    namespace: honk-system

@@ -1,0 +1,10 @@
+id: search-wedges
+title: Service works for 10 minutes after start, then deadlocks and goes unready
+source: {url: "", kind: demo, license_note: written for this repo}
+reproduce: ../../deploy/demo.yaml#search
+signature: not_ready / deployment
+tempting_action: restart_pod
+helps: temporarily
+real_fix: fix the deadlock; a restart only buys 10 minutes
+honk_expected: restart_pod healthy at +3m, retracted at +1h
+reviewed_by: ""

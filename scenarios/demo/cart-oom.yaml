@@ -1,0 +1,10 @@
+id: cart-oom
+title: Process needs more memory than its limit and is OOM-killed on every start
+source: {url: "", kind: demo, license_note: written for this repo}
+reproduce: ../../deploy/demo.yaml#cart
+signature: oom_killed / deployment
+tempting_action: restart_pod
+helps: false
+real_fix: set_resources limits.memory=128Mi (within the 2x policy step)
+honk_expected: restart_pod outcome failed; set_resources outcome fixed after +24h
+reviewed_by: ""
