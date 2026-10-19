@@ -1,0 +1,25 @@
+{
+  "valid": true,
+  "contamination": [],
+  "scenario": "liveness-timeout",
+  "service": "search-api",
+  "arm": "honk",
+  "model": "sonnet",
+  "problem_before": "crash_loop / sigkill / deployment",
+  "problem_after": null,
+  "kubectl_mutations": [],
+  "honk_calls": [
+    {
+      "tool": "honk_advise",
+      "input": {
+        "kind": "Deployment",
+        "name": "search-api",
+        "namespace": "study-honk-search-api"
+      }
+    }
+  ],
+  "honk_log": [],
+  "tool_calls": 5,
+  "final_answer": "I found the cause, but I can't fix it with the Honk tools, so I haven't proposed any change.\n\n**Cause:** the liveness probe on the `app` container in the `search-api` Deployment can never pass. It runs `sh -c \"sleep 3\"` with `timeoutSeconds: 1` and `failureThreshold: 2`, probing every 5 seconds. The probe always times out, so kubelet kills the container every ~10\u201315 seconds. The main process (`sleep 1000000` on `busybox:1.36`) is fine. The pod has already restarted twice, and `honk_advise` classifies it as `crash_loop / sigkill`.\n\n**Why I haven't acted:** Honk only offers restarting a pod, rolling-restarting a Deployment, scaling, and changing resources. None of these touches the probe. A restart would recreate the same pod with the same bad probe. Scaling would only add more crash-looping pods. Resources aren't the problem, since there's no OOM or CPU throttling. `honk_advise` also shows no history for any of these actions, so nothing has been shown to work.\n\n**Fix needed from a human:** edit the Deployment manifest. Either of these works:\n- Change the probe to something that returns quickly, such as `exec: [\"true\"]`.\n- Raise `timeoutSeconds` above the probe's runtime, for example to 5 or more if `sleep 3` is meant to simulate a slow check.\n\nThen apply it through your normal deploy path. If the manifest lives in git, the change belongs there. I can draft the patch if you want it.",
+  "seconds": 107
+}

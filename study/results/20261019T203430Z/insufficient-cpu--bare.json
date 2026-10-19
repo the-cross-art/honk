@@ -1,0 +1,19 @@
+{
+  "valid": true,
+  "contamination": [],
+  "scenario": "insufficient-cpu",
+  "service": "analytics",
+  "arm": "bare",
+  "model": "sonnet",
+  "problem_before": "unschedulable / deployment",
+  "problem_after": "healthy / deployment",
+  "kubectl_mutations": [
+    "patch",
+    "set resources"
+  ],
+  "honk_calls": [],
+  "honk_log": [],
+  "tool_calls": 5,
+  "final_answer": "The `analytics` deployment now runs: the pod is `1/1 Running` and the rollout finished.\n\n**Cause:** the container requested `cpu: 64`. Neither node could fit that. One lacked the CPU, and the other had a taint the pod doesn't tolerate. So the pod stayed `Pending` with `FailedScheduling` events.\n\n**Fix:** I changed the CPU request to `100m` with `kubectl set resources`. The container only runs `sleep 1000000`, so that is plenty.\n\n- **Manifest:** the live deployment now differs from whatever manifest it was applied from. If you keep that manifest in source control, change `cpu: \"64\"` there too, or the next apply will bring the problem back.\n- **No Service:** the namespace has no Service or Ingress, so nothing routes traffic to the pod. The container has no ports and only sleeps, so it wouldn't serve requests either. If you expected `analytics` to be reachable over the network, that needs a separate fix.\n- **Real workload:** if this is a placeholder for a real workload, it will need its own CPU sizing.",
+  "seconds": 300
+}

@@ -1,0 +1,25 @@
+{
+  "valid": true,
+  "contamination": [],
+  "scenario": "slow-leak",
+  "service": "sessions",
+  "arm": "honk",
+  "model": "sonnet",
+  "problem_before": "healthy / deployment",
+  "problem_after": null,
+  "kubectl_mutations": [],
+  "honk_calls": [
+    {
+      "tool": "honk_advise",
+      "input": {
+        "kind": "Deployment",
+        "name": "sessions",
+        "namespace": "study-honk-sessions"
+      }
+    }
+  ],
+  "honk_log": [],
+  "tool_calls": 7,
+  "final_answer": "I haven't proposed any change. The `sessions` deployment has a memory leak that no Honk action can fix, and it isn't failing yet.\n\n**Current state**\n- The deployment is 1/1 available and the pod has 0 restarts. Honk reports it as healthy.\n- The container logs are empty.\n- The namespace has no Service or Endpoints, only the Deployment, so nothing can route to it.\n\n**The leak**\n- The container's command is `leak.append(bytearray(1024*1024)); time.sleep(6)` in a loop. That allocates 1 MiB every 6 seconds and never frees it.\n- The memory limit is 128Mi, so the container will hit it after roughly 13 minutes. Python's baseline memory is included, so it may be sooner.\n- The kernel will then OOMKill it. After that you should see restarts, `OOMKilled`, and eventually `CrashLoopBackOff`. The pod is only 98 seconds old, so that hasn't happened yet.\n\n**Why I haven't proposed anything**\n- `restart_pod` and `rollout_restart` reset the leak for another ~13 minutes. They fix nothing.\n- `set_resources` with a higher memory limit only pushes the OOM later. Memory still grows without bound.\n- `scale` doesn't help, because every replica leaks the same way.\n- Honk has no history for any of these actions on this deployment, and it sees no current problem.\n- The real fix is in the application code: stop accumulating the allocations. Honk can't change the command, and I have no source repo here to edit.\n\n**Decisions for you**\n1. Is the leaking command a deliberate test fixture? If so, I can raise the memory limit with `set_resources` as a stopgap. A human would need to approve that proposal, and it would only delay the OOM.\n2. Did you mean something else by \"service not working\"? A missing Service would explain a client being unable to reach it. Creating one is outside Honk's tools, so you'd need to apply it yourself.\n\nI can also check back in about 15 minutes to confirm the OOM pattern.",
+  "seconds": 117
+}

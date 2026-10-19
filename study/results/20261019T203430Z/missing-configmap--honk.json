@@ -1,0 +1,25 @@
+{
+  "valid": true,
+  "contamination": [],
+  "scenario": "missing-configmap",
+  "service": "billing",
+  "arm": "honk",
+  "model": "sonnet",
+  "problem_before": "config_error / deployment",
+  "problem_after": null,
+  "kubectl_mutations": [],
+  "honk_calls": [
+    {
+      "tool": "honk_advise",
+      "input": {
+        "kind": "Deployment",
+        "name": "billing",
+        "namespace": "study-honk-billing"
+      }
+    }
+  ],
+  "honk_log": [],
+  "tool_calls": 4,
+  "final_answer": "The `billing` service is down because the ConfigMap `app-settings` doesn't exist in `study-honk-billing`. I haven't fixed it, and I haven't proposed a Honk action either.\n\n**Cause:** The pod is stuck in `CreateContainerConfigError` with the event `configmap \"app-settings\" not found`. The Deployment's container `app` loads its environment from that ConfigMap through `envFrom`. The only ConfigMap in the namespace is `kube-root-ca.crt`.\n\n**Why I didn't use a Honk action:** `honk_advise` reports a `config_error` on the Deployment. The Honk tools (`restart_pod`, `rollout_restart`, `scale`, `set_resources`) can't create a ConfigMap. Each of them would leave the pod failing on the same missing config. My kubectl access is read-only, so I can't create the ConfigMap myself.\n\n**What needs to happen:** Someone has to create `app-settings` in `study-honk-billing`. I don't know which keys and values it should hold, and I can't read the namespace's Secrets to check. The values would have to come from you or from wherever the config is kept, such as a Git repo or a Helm chart. Once the ConfigMap exists, the kubelet should pick it up on its next retry. If the pod stays stuck, a `rollout_restart` of `billing` through Honk would be the next step.\n\nIf you tell me the intended contents, I can draft the manifest. Alternatively, if the Deployment shouldn't depend on this ConfigMap, the `envFrom` entry needs to come out of its spec. That's also a change outside the Honk toolset.",
+  "seconds": 109
+}

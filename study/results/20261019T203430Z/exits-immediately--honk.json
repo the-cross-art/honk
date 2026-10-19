@@ -1,0 +1,25 @@
+{
+  "valid": true,
+  "contamination": [],
+  "scenario": "exits-immediately",
+  "service": "reports",
+  "arm": "honk",
+  "model": "sonnet",
+  "problem_before": "crash_loop / clean / deployment",
+  "problem_after": null,
+  "kubectl_mutations": [],
+  "honk_calls": [
+    {
+      "tool": "honk_advise",
+      "input": {
+        "kind": "Deployment",
+        "name": "reports",
+        "namespace": "study-honk-reports"
+      }
+    }
+  ],
+  "honk_log": [],
+  "tool_calls": 4,
+  "final_answer": "I haven't proposed a fix, because none of the Honk tools can fix this.\n\n**Cause:** the `reports` Deployment runs the container `app` (`busybox:1.36`) with the command `sh -c \"echo started\"`. The container prints \"started\" and exits 0. Because `restartPolicy: Always`, Kubernetes restarts it every time, and it ends up in CrashLoopBackOff. The pod shows `Completed` with 4 restarts, and the Deployment has 0 of 1 available. The logs show only `started`. There are no resource, scheduling or image-pull problems.\n\n**Why Honk can't fix it:** Honk's tools (`restart_pod`, `rollout_restart`, `scale`, `set_resources`) can't change a container's command. Honk reports no history for any of them on this problem. Each would just re-run the same command, which exits again. I didn't propose any of them, since they would only add noise for the approver.\n\n**What needs to change:** the Deployment manifest. Its `command` should start a long-running reports server instead of `echo started`. I can't tell from the cluster what that process should be, or whether `busybox` is the right image at all. The owner of the manifest needs to supply the real image and command, then apply the change (for example with `kubectl apply` or through your pipeline). A rollout restart after that isn't needed, since changing the pod template triggers one.\n\nIf you tell me the intended image and command, I can draft the corrected manifest.",
+  "seconds": 111
+}

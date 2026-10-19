@@ -70,6 +70,16 @@ def test_resource_limits() -> None:
     assert check_resources({"requests.memory": "64Mi"}, current, limits) is None
 
 
+def test_a_large_cut_is_reported_as_a_fraction() -> None:
+    """Found in the agent study: 64 CPUs to 250m was reported as '0.00x'."""
+    refusal = check_resources({"requests.cpu": "250m"}, {"requests": {"cpu": "64"}},
+                              Limits(max_resource_factor=2.0))
+    assert refusal is not None and "1/256 of" in refusal
+    up = check_resources({"limits.memory": "1Gi"}, {"limits": {"memory": "256Mi"}},
+                         Limits(max_resource_factor=2.0))
+    assert up is not None and "4.00x" in up
+
+
 def _seed(ledger: Ledger) -> str:
     pid = ledger.record_proposal(
         now=T0, client="t", action=ActionType.RESTART_POD, kind="Pod", namespace="shop",

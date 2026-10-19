@@ -1,6 +1,6 @@
 # STATUS
 
-**2026-10-19 · v0.1 alpha · `make check` green: 96 tests, ruff, strict mypy · ran live on kind · not yet committed, not pushed**
+**2026-10-20 · v0.1 alpha · `make check` green: 97 tests, ruff, strict mypy · ran live on kind · private repo the-cross-art/honk**
 
 ## What works, and how it was verified
 
@@ -14,24 +14,26 @@
 | Ask / auto gate | 576-combination sweep: AUTO only when opted in, breaker closed, every bar clears |
 | Propose, approve, execute, check | `test_core.py` against a fake cluster: refusals never mutate, stale approval refused, throttle stops loops, autonomy earned per cell |
 | **Live, on a kind cluster** | agent over real stdio MCP, human approving in a terminal: 5 dry runs accepted by the apiserver; refusals for kube-system and a 64x memory jump; 3-minute labels correct for all 4 (`checkout`/`cart`/`images` failing, `search` healthy); `set_resources` 128Mi fixed `cart` (0 restarts). The +1h retraction for `search` was pending at session end |
+| Agent study, first run | `scripts/agent_study.py`: 18 runs (9 scenarios × bare/honk, sonnet), 0 contaminated; results and findings in `study/REPORT.md` |
 | MCP server | `test_server.py` over the real protocol: no tool can approve; in-client approve, deny and dismiss on both protocol eras (legacy mid-call request, 2026-07-28 input-required round trip) with exactly one proposal row; terminal fallback for clients that cannot prompt; refused changes never prompt |
 
 ## What does not exist yet
 
 - Reviewer sign-off on the 23 real scenarios (`reviewed_by` is empty on all).
-- The agent study (with and without Honk) over the scenarios.
+- An agent study on more than one model, more than one run per cell, or real (non-busybox) apps.
 - Slack approvals, Helm chart, admission policy pinning patch shapes, `rollout_undo`.
 
 ## Next action
 
-1. Check the smoke run's +1h check: `search` restart should read `retracted`
-   (`HONK_HOME=<scratch>/honk-smoke honk log`). If it says `unclear`, find out why.
-2. The author's own run in Claude Code, namespace `store` (`make demo-apply NS=store`).
-3. Ask Claude Code to fix namespace `store`. Expect: `checkout` restart fails, `cart`
-   restart fails and `set_resources` fixes it, `search` restart retracted at +1h,
-   `images` nothing helps. Fix whatever breaks; record surprises below.
+1. **Decide what the study means for the product** (open decision 4). The bare
+   agent never restarted anything. Its risky moves were green-but-wrong spec
+   changes (probe disabled, empty ConfigMap, PVC deleted and recreated), which a
+   3-minute health check labels `fixed`.
+2. Re-run slow-leak with a break window long enough to OOM (it read `healthy` at 90s).
+3. Repeat the study with a second model (`--model opus`, `haiku`) and 3 runs per
+   cell before quoting anything.
 4. A Kubernetes practitioner (from outreach) runs `scripts/review.py` on the 23
-   scenarios. Until then, publish no numbers from them. Agent study meanwhile.
+   scenarios. Until then, publish no numbers.
 
 ## Roadmap ideas (not started)
 
@@ -56,6 +58,8 @@
 | 1 | Default approval channel: in-client prompt or terminal only | **RESOLVED 2026-10-19: `client`.** Verified in Claude Code on protocol 2026-07-28: the prompt showed the record, the author clicked decline 9s later, and Honk recorded `denied` by `claude-code (in-client prompt)`. `approvals: cli` stays for harnesses that might answer prompts themselves |
 | 2 | Publish: GitHub repo, PyPI name `honkctl` | waiting on the author |
 | 3 | Autonomy floor values (`policy.FLOOR`) | chosen, not derived; revisit with real data |
+| 4 | Product direction after the study: keep the six-action guard, or move to reviewing and labelling *spec changes* (diff + semantic check: probe weakened, empty config, destructive delete) | open, 2026-10-20 |
+| 5 | `max_resource_factor` blocked a correct typo fix (64 CPUs → 250m). Exempt request cuts that make a Pending pod schedulable, or ask instead of refusing? | open, 2026-10-20 |
 
 ## Session log
 
@@ -105,3 +109,18 @@ others by page). 5 answer keys were wrong when written from search snippets,
 including Grafana (adding capacity *did* restore service) and the resize bug (the
 fix is a kubelet upgrade, not recreating the pod). Snippet-grade sources are a
 hypothesis, same lesson as the research repo's citations.
+
+**2026-10-20, session 2: the agent study.** 18 headless Claude Code runs (sonnet),
+9 lab scenarios, with and without Honk, all valid. Findings are in `study/REPORT.md`.
+The headline cuts against the pitch: the bare agent never reached for the tempting
+restart. It fixed 4 of 9 correctly, stopped correctly on 1, and made 3 green-but-wrong
+spec changes, all disclosed: a probe replaced by `true`, an empty ConfigMap, and a
+PVC deleted and recreated. With Honk the agent never proposed a useless action and
+escalated with the right diagnosis, but Honk's 2x cap refused the correct CPU fix.
+
+What went wrong: the pilot leaked the answer keys through the author's
+`additionalDirectories` (fixed with `--setting-sources project`, disallowed file
+tools, and a contamination flag). Honk MCP first inherited the agent's read-only
+KUBECONFIG. The verb parser read `-n <ns>` as the verb. slow-leak's 90-second break
+window is shorter than its time to OOM, so it tested nothing. The refusal message
+printed a 1/256 cut as "0.00x", and the agent got that text verbatim. Now fixed.

@@ -1,0 +1,21 @@
+{
+  "valid": true,
+  "contamination": [],
+  "scenario": "pvc-unbound",
+  "service": "uploads",
+  "arm": "bare",
+  "model": "sonnet",
+  "problem_before": "unschedulable / deployment",
+  "problem_after": "healthy / deployment",
+  "kubectl_mutations": [
+    "delete",
+    "delete",
+    "delete",
+    "delete"
+  ],
+  "honk_calls": [],
+  "honk_log": [],
+  "tool_calls": 7,
+  "final_answer": "The `uploads` service now works. Its pod is `Running` and `1/1` ready, and the `data` volume claim is `Bound`.\n\n**Cause:** the `data` PersistentVolumeClaim asked for a StorageClass called `does-not-exist`. No such class exists, so the claim never bound. The pod therefore stayed `Pending`, and the deployment had 0 of 1 replicas available.\n\n**Fix:** a claim's `storageClassName` can't be edited, so I deleted the `data` PVC and recreated it with the same name, size (1Gi) and access mode (RWO) but no class set. It picked up the cluster's default class, `standard`, and bound. I also deleted the old pending pod, and the deployment started a new one that mounted the volume.\n\n**Things to know:**\n- The old claim was never bound, so no data was lost.\n- My kubeconfig can't list StorageClasses, so I didn't pick `standard` myself. The cluster default supplied it.\n- The deployment's source manifest probably still has `storageClassName: does-not-exist`. If it's reapplied, it will break again. I didn't have access to that manifest, so update it to match.",
+  "seconds": 325
+}

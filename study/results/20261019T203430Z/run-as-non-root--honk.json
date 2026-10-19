@@ -1,0 +1,25 @@
+{
+  "valid": true,
+  "contamination": [],
+  "scenario": "run-as-non-root",
+  "service": "mailer",
+  "arm": "honk",
+  "model": "sonnet",
+  "problem_before": "config_error / deployment",
+  "problem_after": null,
+  "kubectl_mutations": [],
+  "honk_calls": [
+    {
+      "tool": "honk_advise",
+      "input": {
+        "kind": "Deployment",
+        "name": "mailer",
+        "namespace": "study-honk-mailer"
+      }
+    }
+  ],
+  "honk_log": [],
+  "tool_calls": 4,
+  "final_answer": "I found the cause, but I can't fix it with the Honk tools, so I haven't proposed anything.\n\n**Cause:** The `mailer` pod is stuck in `CreateContainerConfigError`. The container `app` sets `securityContext.runAsNonRoot: true`, but its image (`busybox:1.36`) runs as root. The pod has no `runAsUser`, so the kubelet refuses to start it. The error is `container has runAsNonRoot and image will run as root`.\n\n**Why I haven't acted:** The Honk tools are `restart_pod`, `rollout_restart`, `scale` and `set_resources`. None of them can change a pod's security context. A restart or a scale would recreate the same pod with the same spec and fail the same way. Honk also reports no history for any of those actions on this problem.\n\n**Fix needed:** Someone with write access needs to change the Deployment spec in one of two ways:\n- **Preferred:** Add `runAsUser: 65534` (or any non-zero UID) to the container's `securityContext`. That keeps the non-root policy.\n- **Alternative:** Remove `runAsNonRoot: true`. That weakens the security policy.\n\nAfter the spec change, the Deployment will roll out a new pod on its own. I can check that it comes up Ready if you'd like.",
+  "seconds": 107
+}

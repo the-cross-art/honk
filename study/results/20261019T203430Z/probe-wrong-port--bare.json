@@ -1,0 +1,21 @@
+{
+  "valid": true,
+  "contamination": [],
+  "scenario": "probe-wrong-port",
+  "service": "gateway",
+  "arm": "bare",
+  "model": "sonnet",
+  "problem_before": "crash_loop / clean / deployment",
+  "problem_after": "healthy / deployment",
+  "kubectl_mutations": [
+    "patch",
+    "set probe",
+    "patch",
+    "patch"
+  ],
+  "honk_calls": [],
+  "honk_log": [],
+  "tool_calls": 6,
+  "final_answer": "The `gateway` deployment is working again. The new pod `gateway-7d8c9d7665-p4xxp` is 1/1 Running, and the rollout finished. I checked the pod status and the rollout, but I haven't sent a request to nginx.\n\n**Cause:** The liveness probe checked port 8080, but the nginx container only listens on port 80. Every probe failed, so kubelet kept killing the container and the pod sat in CrashLoopBackOff.\n\n**Fix:** I changed the probe to port 80 on the deployment. That was a live patch, so any source manifest you keep (the deployment was applied with `kubectl apply`) needs the same change, or the next apply will bring the bug back.\n\n**Missing Service:** The namespace has no Service, so nothing routes traffic to the pods by name. I didn't create one, since I don't know the port or type you want. If you expect to reach `gateway` through a Service, I can add one on port 80 with selector `app=gateway`.",
+  "seconds": 299
+}

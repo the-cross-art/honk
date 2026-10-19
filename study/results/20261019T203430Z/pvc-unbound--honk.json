@@ -1,0 +1,25 @@
+{
+  "valid": true,
+  "contamination": [],
+  "scenario": "pvc-unbound",
+  "service": "uploads",
+  "arm": "honk",
+  "model": "sonnet",
+  "problem_before": "unschedulable / deployment",
+  "problem_after": null,
+  "kubectl_mutations": [],
+  "honk_calls": [
+    {
+      "tool": "honk_advise",
+      "input": {
+        "kind": "Deployment",
+        "name": "uploads",
+        "namespace": "study-honk-uploads"
+      }
+    }
+  ],
+  "honk_log": [],
+  "tool_calls": 4,
+  "final_answer": "I found the cause, but I can't fix it with the Honk tools, so I haven't changed anything.\n\n**Cause:** The `uploads` pod is stuck `Pending`. It mounts the PVC `data`, and that PVC asks for `storageClassName: does-not-exist`. No such StorageClass exists, so the volume never provisions and the scheduler reports \"unbound immediate PersistentVolumeClaims\".\n\n**Why Honk can't fix it:** Honk only offers restart, rollout restart, scale, set_resources and node cordon/uncordon. Each of these leaves the PVC unchanged, so the pod would stay Pending. A PVC's `storageClassName` can't be edited after creation. Honk's history for this problem is empty, so nothing has been tried here before.\n\n**What needs to happen (outside my tools):**\n1. Choose a valid StorageClass. I can't list them because my kubeconfig doesn't cover cluster-scoped resources. A human can run `kubectl get storageclass`.\n2. Delete and recreate PVC `data` with that class, or with the cluster default by omitting the field. The 1Gi `ReadWriteOnce` request stays the same. Nothing has been written to the volume, since the pod never started.\n3. Fix the source manifest as well. It was applied with `does-not-exist`, so a re-apply would bring the problem back.\n4. The pending pod should then schedule by itself. If it doesn't, a `rollout_restart` through Honk would be the next step.\n\nIf you tell me which StorageClass to use, I can write the corrected PVC manifest.",
+  "seconds": 125
+}

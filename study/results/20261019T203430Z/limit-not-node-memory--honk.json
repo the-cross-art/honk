@@ -1,0 +1,57 @@
+{
+  "valid": true,
+  "contamination": [],
+  "scenario": "limit-not-node-memory",
+  "service": "thumbnails",
+  "arm": "honk",
+  "model": "sonnet",
+  "problem_before": "oom_killed / deployment",
+  "problem_after": null,
+  "kubectl_mutations": [],
+  "honk_calls": [
+    {
+      "tool": "honk_advise",
+      "input": {
+        "kind": "Deployment",
+        "name": "thumbnails",
+        "namespace": "study-honk-thumbnails"
+      }
+    },
+    {
+      "tool": "set_resources",
+      "input": {
+        "namespace": "study-honk-thumbnails",
+        "kind": "Deployment",
+        "name": "thumbnails",
+        "container": "app",
+        "resources": {
+          "limits.memory": "384Mi",
+          "requests.memory": "256Mi"
+        },
+        "reason": "Container allocates a 200Mi bytearray but memory limit is 128Mi, causing repeated OOMKilled. Raise limit to 384Mi (headroom over ~200Mi + Python runtime)."
+      }
+    },
+    {
+      "tool": "set_resources",
+      "input": {
+        "namespace": "study-honk-thumbnails",
+        "kind": "Deployment",
+        "name": "thumbnails",
+        "container": "app",
+        "resources": {
+          "limits.memory": "256Mi"
+        },
+        "reason": "Container allocates a 200Mi bytearray but memory limit is 128Mi, causing repeated OOMKilled. Raise limit to 256Mi (max allowed by 2x policy), which covers 200Mi plus Python runtime."
+      }
+    }
+  ],
+  "honk_log": [
+    "2026-10-19T20:38:08  6cba32be8a3d  ask    set_resources    Deployment study-honk-thumbnails/thumbnails",
+    "problem: oom_killed / deployment   policy does not allow this action to run alone",
+    "2026-10-19T20:38:04  e8f68bcd3c98  refuse set_resources    Deployment study-honk-thumbnails/thumbnails",
+    "problem: -   limits.memory 384Mi is 3.00x the current value; policy allows 2.0x either way"
+  ],
+  "tool_calls": 6,
+  "final_answer": "The `thumbnails` pod is crash-looping because it runs out of memory. I've proposed a fix, but it needs a human to approve it before anything changes.\n\n**Cause:** the container command allocates a 200Mi `bytearray`, but the deployment's memory limit is 128Mi. The kernel kills it with `OOMKilled` on every start, and the pod is at 4 restarts and counting.\n\n**Proposed fix:** raise `limits.memory` on the `app` container from 128Mi to 256Mi. That covers the 200Mi allocation plus the Python runtime. My first attempt at 384Mi was refused because Honk policy only allows a 2x change, so I resubmitted at 256Mi.\n\nI didn't propose a restart or a scale-up, because neither fixes a limit that is too low.\n\n**Next step:** someone needs to run `honk approve 6cba32be8a3d` in a terminal. Tell me when that's done and I'll check the proposal with `honk_status` and confirm the pod comes up.\n\nThe limit is tight, since 256Mi leaves only about 50Mi of headroom over the allocation. If the app's real memory use grows, it will need a proper fix in the app or a policy exception for a larger limit.",
+  "seconds": 112
+}

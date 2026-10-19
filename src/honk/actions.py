@@ -195,7 +195,9 @@ def check_resources(
             continue
         factor = new / old
         if factor > limits.max_resource_factor or factor < 1 / limits.max_resource_factor:
-            return (f"{key} {value} is {factor:.2f}x the current value; policy allows "
+            # 250m against 64 is 0.0039x: say "1/256 of", not a rounded "0.00x"
+            size = f"{factor:.2f}x" if factor >= 1 else f"1/{1 / factor:.0f} of"
+            return (f"{key} {value} is {size} the current value; policy allows "
                     f"{limits.max_resource_factor}x either way")
     return None
 

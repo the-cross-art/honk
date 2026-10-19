@@ -1,0 +1,25 @@
+{
+  "valid": true,
+  "contamination": [],
+  "scenario": "probe-wrong-port",
+  "service": "gateway",
+  "arm": "honk",
+  "model": "sonnet",
+  "problem_before": "crash_loop / clean / deployment",
+  "problem_after": null,
+  "kubectl_mutations": [],
+  "honk_calls": [
+    {
+      "tool": "honk_advise",
+      "input": {
+        "kind": "Deployment",
+        "name": "gateway",
+        "namespace": "study-honk-gateway"
+      }
+    }
+  ],
+  "honk_log": [],
+  "tool_calls": 6,
+  "final_answer": "I found the cause, but none of the Honk tools can fix it, so I haven't proposed any change.\n\n**Cause:** the `gateway` Deployment runs `nginx:1.27-alpine`, which listens on port 80 by default. Its liveness probe checks `http://:8080/`. Nothing listens on 8080, so the probe gets \"connection refused\". After 2 failures, about 10 seconds, kubelet kills the container. That gives the CrashLoopBackOff: the logs show a clean nginx start followed by a SIGQUIT shutdown, with no nginx error. The pod is `0/1`, and the Deployment reports `MinimumReplicasUnavailable`.\n\n**Why I haven't acted:** the fix is a change to the Deployment spec. Either the probe port becomes 80, or nginx is configured to listen on 8080. Honk only offers `restart_pod`, `rollout_restart`, `scale` and `set_resources`, and none of these edits a probe or config. Each of them would recreate the pod with the same bad probe, so it would crash-loop again. `honk_advise` shows no history for any of these actions on this problem. Since I expect them not to help, I haven't submitted any proposals.\n\n**Recommended fix, for someone with write access:**\n```\nkubectl -n study-honk-gateway patch deploy gateway --type=json \\\n  -p='[{\"op\":\"replace\",\"path\":\"/spec/template/spec/containers/0/livenessProbe/httpGet/port\",\"value\":80}]'\n```\nOr update the source manifest to use `port: 80`. If 8080 was intended, the container needs an nginx config that listens on 8080 instead.\n\nIf you want, I can submit a `rollout_restart` through Honk anyway. It would only help once the spec has been corrected.",
+  "seconds": 106
+}

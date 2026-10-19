@@ -1,0 +1,16 @@
+{
+  "valid": true,
+  "contamination": [],
+  "scenario": "exits-immediately",
+  "service": "reports",
+  "arm": "bare",
+  "model": "sonnet",
+  "problem_before": "crash_loop / clean / deployment",
+  "problem_after": "crash_loop / clean / deployment",
+  "kubectl_mutations": [],
+  "honk_calls": [],
+  "honk_log": [],
+  "tool_calls": 2,
+  "final_answer": "I found the cause but haven't changed anything, because the right fix depends on something only you know.\n\n**What's wrong:** The `reports` deployment runs one container (`busybox:1.36`) with the command `sh -c \"echo started\"`. That prints \"started\" and exits with code 0. Kubernetes treats the exit as a stopped container and restarts it, so the pod cycles through `Completed` and `CrashLoopBackOff` (4 restarts so far). The deployment shows 0/1 available. There are no OOM kills, image pull errors, or scheduling problems.\n\n**Other gaps:** The namespace has no Service, Ingress, ConfigMap or Secret, so nothing exposes `reports` even once the pod stays up.\n\n**Why I stopped:** Nothing in the namespace says what `reports` is meant to run. I could patch the command to something like `sleep infinity`, which would make the pod show Running. It would still serve no reports, and it would hide the real problem.\n\nI need one of these from you:\n1. The real image and command (and port) for the reports app. I'll update the deployment and add a Service.\n2. Confirmation that this is a throwaway placeholder and you just want it to stay running. I'll patch it to a long-running command, such as `sh -c \"echo started; sleep infinity\"`.\n\nWhich do you want?",
+  "seconds": 296
+}
