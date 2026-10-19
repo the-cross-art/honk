@@ -113,8 +113,13 @@ def build(honk: Honk, *, approvals_in_client: bool = True) -> MCPServer:
         """Resolver: build the question from a read-only preview. The SDK reuses an
         answer only for the identical question, so a changed problem or record is
         asked afresh rather than approved on stale information."""
-        if not (approvals_in_client and _supports_elicitation(ctx)):
-            return NoPrompt(why="no in-client prompts")
+        if not approvals_in_client:
+            return NoPrompt(why="policy says approvals: cli")
+        if not _supports_elicitation(ctx):
+            print(f"honk: approval goes to the terminal: the client did not declare the "
+                  f"elicitation capability ({ctx.client_capabilities!r})",
+                  file=sys.stderr, flush=True)
+            return NoPrompt(why="client cannot show prompts")
         preview = await runner.run(lambda: honk.preview(p))
         if preview.mode is not Mode.ASK:
             return NoPrompt(why=preview.mode.value)
